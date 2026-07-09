@@ -4,83 +4,56 @@ import ApiError from '../utils/ApiError.js';
 import { uploadOnCloudinary } from '../utils/cloudinary.js';
 import ApiResponse from '../utils/ApiResponse.js';
 
-const  createPost = asyncHandler(async(req, res) =>{
-    const {title, content} = req.body
-    if(!title || !content){
-        throw new ApiError(400,"Title and content are requiresd")
+const createPost = asyncHandler(async (req, res) => {
+    const { title, content } = req.body;
 
+    if (!title || !content) {
+        throw new ApiError(400, "Title and content are required");
     }
-    const thumbnailPath = req.files?.thumbnail?.[0]?.path
 
-    const contentImageFiles = req.files?.contentImages || []
+    const thumbnailPath = req.files?.thumbnail?.[0]?.path;
+    const contentImageFiles = req.files?.contentImages || [];
 
-    let thumbnailURL = ""
+    let thumbnailURL = "";
 
+    if (thumbnailPath) {
+        const uploadedThumbnail = await uploadOnCloudinary(thumbnailPath);
 
-    if(thumbnailPath){
-
-        const uploadedThumbnail =
-        await uploadOnCloudinary(
-            thumbnailPath
-        )
-
-        if(!uploadedThumbnail){
-
-            throw new ApiError(
-                500,
-                "Thumbnail upload failed"
-            )
-
+        if (!uploadedThumbnail) {
+            throw new ApiError(500, "Thumbnail upload failed");
         }
 
-        thumbnailURL =
-        uploadedThumbnail.url
-
+        thumbnailURL = uploadedThumbnail.url;
     }
-     let imageURLs = []
 
+    let imageURLs = [];
 
-    if(contentImageFiles.length>0){
-
-        const uploadedImages =
-        await Promise.all(
-
-            contentImageFiles.map(
-
-                file =>
-
-                uploadOnCloudinary(
-                    file.path
-                )
-
+    if (contentImageFiles.length > 0) {
+        const uploadedImages = await Promise.all(
+            contentImageFiles.map(file =>
+                uploadOnCloudinary(file.path)
             )
+        );
 
-        )
-
-
-        imageURLs =
-        uploadedImages.map(
-
-            image => image.url
-
-        )
-
+        imageURLs = uploadedImages.map(image => image.url);
     }
 
     const post = await Post.create({
         title,
         content,
-        author :req.user._id,
-        thumbnail: thumbnailPath,
-        contentImages: contentImageFiles.map(file => file.path)     
-    })
+        author: req.user._id,
+        thumbnail: thumbnailURL,
+        contentImages: imageURLs
+    });
+
     return res.status(201).json(
-        new ApiResponse(201,
+        new ApiResponse(
+            201,
             post,
             "Post created successfully"
         )
-    )
-})
+    );
+});
 
 const getAllPosts = asyncHandler(async(req,res)=>{
 
@@ -176,56 +149,57 @@ const getSinglePost = asyncHandler(async(req, res) =>{
     )
 })
 
-const updatePost = asyncHandler(async(req,res)=>{
-    const post = Post.findById(req.param._id)
+const updatePost = asyncHandler(async (req, res) => {
 
-    if(!post){
-        throw new ApiError(400, " Post not found")
+    const post = await Post.findById(req.params.id);
+
+    if (!post) {
+        throw new ApiError(404, "Post not found");
     }
 
-    if(post.author.toString() !== req.user._id.String()){
-        throw new ApiError(400,"Unauthorized")
+    if (post.author.toString() !== req.user._id.toString()) {
+        throw new ApiError(403, "Unauthorized");
     }
-  const UpdatedPost =  await Post.findByIdAndUpdate(
-        req.param._id,
+
+    const updatedPost = await Post.findByIdAndUpdate(
+        req.params.id,
         req.body,
         {
             new: true,
             runValidators: true
         }
-    )
+    );
 
-    return req.status(200).json(
+    return res.status(200).json(
         new ApiResponse(
             200,
             updatedPost,
-            "Updated Successfully"
+            "Post updated successfully"
         )
-    )
-})
+    );
+});
+const deletePost = asyncHandler(async (req, res) => {
 
-const deletePost = asyncHandler(async(req,res)=>{
-    const post = await Post.findById(req.param._id)
+    const post = await Post.findById(req.params.id);
 
-    if(!post){
-        throw new ApiError(400, " Post not found")
+    if (!post) {
+        throw new ApiError(404, "Post not found");
     }
 
-    if(post.author.toString() !== req.user._id.toString()){
-         throw new ApiError(400,"Unauthorized")
+    if (post.author.toString() !== req.user._id.toString()) {
+        throw new ApiError(403, "Unauthorized");
     }
 
-    await post.deleteOne()
+    await post.deleteOne();
 
-    return req.status(200).json(
-        new ApiResponse( 
+    return res.status(200).json(
+        new ApiResponse(
             200,
             {},
-            "Post deleted Successfully"
+            "Post deleted successfully"
         )
-    )
-})
-  
+    );
+});  
 export default {
    createPost,
     getAllPosts,

@@ -30,9 +30,9 @@ const likePost = asyncHandler(async(req,res)=>{
         post:postId
     })
 
-    return res.status(201,).json(
+    return res.status(200,).json(
         new ApiResponse(
-            201,
+            200,
             {},
             "Post Liked"
         )
@@ -51,7 +51,7 @@ const getLikedPosts = asyncHandler(async(req,res)=>{
         }
     })
     const posts = likes.map(
-        likes => likes.post
+        like => like.post
     )
         return res.status(200).json(
 

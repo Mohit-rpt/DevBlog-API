@@ -10,7 +10,7 @@ const toggleBookmark = asyncHandler(async(req,res)=>{
     const postExists = await Post.findById(postId)
 
     if(!postExists){
-        throw new ApiError(400,"Post not Found")
+        throw new ApiError(404,"Post not Found")
     }
 
     const existingBookmark =  await Bookmark.findOne(

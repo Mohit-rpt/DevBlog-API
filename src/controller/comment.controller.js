@@ -26,9 +26,9 @@ const addComment = asyncHandler(async(req,res)=>{
             post: postId
         })
 
-        return res.status(200).json(
+        return res.status(201).json(
             new ApiResponse(
-                200,
+                201,
                 comment,
                 "Comment Added Successfully"
             )
@@ -64,6 +64,11 @@ const updateComment = asyncHandler(async(req,res)=>{
     if(!comment){
         throw new ApiError(400,"comment not Found")
     }
+
+    if (!content || content.trim() === "") {
+    throw new ApiError(400, "Comment content is required");
+    }
+
     if(comment.owner.toString() !== req.user._id.toString()){
         throw new ApiError(
             403,
@@ -78,12 +83,12 @@ const updateComment = asyncHandler(async(req,res)=>{
         },
         {
             new:true,
-            runValidator:true
+            runValidators:true
         }
     )
-    return res.status(200).json(
+    return res.status(201).json(
         new ApiResponse(
-            200,
+            201,
             updatedComment,
             "Comment Updated Successfully"
         )
@@ -98,10 +103,10 @@ const deleteComment = asyncHandler(async(req,res)=>{
    if(!comment){
     throw new ApiError(400," comment not found")
    }
-   if(comment.owner.toString !== req.user._id.toString()){
+   if(comment.owner.toString() !== req.user._id.toString()){
     throw new ApiError(400,"Unauthorized")
    }
-    await Comment.deleteOne()
+    await comment.deleteOne()
 
     return res.status(200).json(
         new ApiResponse(

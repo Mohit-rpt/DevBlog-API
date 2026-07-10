@@ -4,40 +4,55 @@ import Post from '../models/post.model.js';
 import ApiError from '../utils/ApiError.js';
 import ApiResponse from '../utils/ApiResponse.js';
 
-const likePost = asyncHandler(async(req,res)=>{
-    const { postId } = req.params
-    const postExists = await Post.findById(postId)
-    if(!postExists){
-        throw new ApiError(400,"Post Not found")
+import mongoose from "mongoose";
+
+const likePost = asyncHandler(async (req, res) => {
+    const { postId } = req.params;
+
+    // Validate Post ID
+    if (!mongoose.Types.ObjectId.isValid(postId)) {
+        throw new ApiError(400, "Invalid post ID");
     }
+
+    // Check if post exists
+    const post = await Post.findById(postId);
+
+    if (!post) {
+        throw new ApiError(404, "Post not found");
+    }
+
+    // Check existing like
     const existingLike = await Like.findOne({
-        owner:req.user._id,
-        post:postId
-    })
-    if(existingLike){
-        await existingLike.deleteOne()
+        owner: req.user._id,
+        post: postId
+    });
+
+    // Toggle Like
+    if (existingLike) {
+        await existingLike.deleteOne();
 
         return res.status(200).json(
             new ApiResponse(
                 200,
-                {},
-                "Like Removed"
+                null,
+                "Post unliked successfully"
             )
-        )
+        );
     }
-    await Like.create({
-        owner:req.user._id,
-        post:postId
-    })
 
-    return res.status(200,).json(
+    await Like.create({
+        owner: req.user._id,
+        post: postId
+    });
+
+    return res.status(201).json(
         new ApiResponse(
-            200,
-            {},
-            "Post Liked"
+            201,
+            null,
+            "Post liked successfully"
         )
-    )
-})
+    );
+});
 
 const getLikedPosts = asyncHandler(async(req,res)=>{
     const likes = await Like.find({

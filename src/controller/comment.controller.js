@@ -4,118 +4,163 @@ import Post from '../models/post.model.js';
 
 import ApiError from '../utils/ApiError.js';
 import ApiResponse from '../utils/ApiResponse.js';
+import mongoose from "mongoose";
 
+const addComment = asyncHandler(async (req, res) => {
+    const { postId } = req.params;
+    const content = req.body.content?.trim();
 
-const addComment = asyncHandler(async(req,res)=>{
-        const {content} = req.body
-        const {postId} = req.params
-
-        if(!content){
-            throw new ApiError(400,"Comment content required")
-        }
-
-        const postExists = await Post.findById(postId)
-
-        if(!postExists){
-            throw new ApiError(400,"Post didnot exists")
-        }
-
-        const comment = await Comment.create({
-            content,
-            owner: req.user._id,
-            post: postId
-        })
-
-        return res.status(201).json(
-            new ApiResponse(
-                201,
-                comment,
-                "Comment Added Successfully"
-            )
-        )
-})
-
-const getComment = asyncHandler(async(req,res) =>{
-    const  {postId} = req.params
-
-    const comment = await Comment.find({
-        post:postId
-    })
-    .populate("owner","fullname email")
-    .sort({createdAt:-1})
-
-    return res.status(200).json(
-        new ApiResponse(
-            200,
-            comment,
-            "comment fetched successfully"
-        )
-    )
-
-})
-
-const updateComment = asyncHandler(async(req,res)=>{
-
-    const {content} = req.body
-    const {commentId} = req.params
-
-    const comment = await Comment.findById(commentId)
-
-    if(!comment){
-        throw new ApiError(400,"comment not Found")
+    // Validate Post ID
+    if (!mongoose.Types.ObjectId.isValid(postId)) {
+        throw new ApiError(400, "Invalid post ID");
     }
 
-    if (!content || content.trim() === "") {
-    throw new ApiError(400, "Comment content is required");
+    // Validate Content
+    if (!content) {
+        throw new ApiError(400, "Comment content is required");
     }
 
-    if(comment.owner.toString() !== req.user._id.toString()){
-        throw new ApiError(
-            403,
-            "Unauthorized"
-        )
+    // Check if post exists
+    const post = await Post.findById(postId);
+
+    if (!post) {
+        throw new ApiError(404, "Post not found");
     }
 
-    const updatedComment = await Comment.findByIdAndUpdate(
-        commentId,
-        {
-            content
-        },
-        {
-            new:true,
-            runValidators:true
-        }
-    )
+    // Create comment
+    const comment = await Comment.create({
+        content,
+        owner: req.user._id,
+        post: postId
+    });
+
+    // Populate owner details
+    const createdComment = await Comment.findById(comment._id)
+        .populate("owner", "fullname username email avatar")
+        .lean();
+
     return res.status(201).json(
         new ApiResponse(
             201,
-            updatedComment,
-            "Comment Updated Successfully"
+            createdComment,
+            "Comment added successfully"
         )
-    )
-})
+    );
+});
 
-const deleteComment = asyncHandler(async(req,res)=>{
-    const {commentId} = req.params
+const getComment = asyncHandler(async (req, res) => {
+    const { postId } = req.params;
 
-   const comment = await Comment.findById(commentId)
+    // Validate Post ID
+    if (!mongoose.Types.ObjectId.isValid(postId)) {
+        throw new ApiError(400, "Invalid post ID");
+    }
 
-   if(!comment){
-    throw new ApiError(400," comment not found")
-   }
-   if(comment.owner.toString() !== req.user._id.toString()){
-    throw new ApiError(400,"Unauthorized")
-   }
-    await comment.deleteOne()
+    // Check if post exists
+    const post = await Post.findById(postId);
+
+    if (!post) {
+        throw new ApiError(404, "Post not found");
+    }
+
+    // Fetch comments
+    const comments = await Comment.find({ post: postId })
+        .populate("owner", "fullname username email avatar")
+        .sort({ createdAt: -1 })
+        .lean();
 
     return res.status(200).json(
         new ApiResponse(
             200,
-            {},
-            "Comment Deleted Successfully"
+            {
+                totalComments: comments.length,
+                comments
+            },
+            "Comments fetched successfully"
         )
-    )
-})
+    );
+});
+
+const updateComment = asyncHandler(async (req, res) => {
+    const { commentId } = req.params;
+    const content = req.body.content?.trim();
+
+    // Validate Comment ID
+    if (!mongoose.Types.ObjectId.isValid(commentId)) {
+        throw new ApiError(400, "Invalid comment ID");
+    }
+
+    // Validate Content
+    if (!content) {
+        throw new ApiError(400, "Comment content is required");
+    }
+
+    // Find Comment
+    const comment = await Comment.findById(commentId);
+
+    if (!comment) {
+        throw new ApiError(404, "Comment not found");
+    }
+
+    // Authorization
+    if (!comment.owner.equals(req.user._id)) {
+        throw new ApiError(
+            403,
+            "You are not authorized to update this comment"
+        );
+    }
+
+    // Update
+    comment.content = content;
+    await comment.save();
+
+    const updatedComment = await Comment.findById(comment._id)
+        .populate("owner", "fullname username email avatar")
+        .lean();
+
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            updatedComment,
+            "Comment updated successfully"
+        )
+    );
+});
+
+const deleteComment = asyncHandler(async (req, res) => {
+    const { commentId } = req.params;
+
+    // Validate Comment ID
+    if (!mongoose.Types.ObjectId.isValid(commentId)) {
+        throw new ApiError(400, "Invalid comment ID");
+    }
+
+    // Find Comment
+    const comment = await Comment.findById(commentId);
+
+    if (!comment) {
+        throw new ApiError(404, "Comment not found");
+    }
+
+    // Authorization
+    if (!comment.owner.equals(req.user._id)) {
+        throw new ApiError(
+            403,
+            "You are not authorized to delete this comment"
+        );
+    }
+
+    // Delete Comment
+    await comment.deleteOne();
+
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            null,
+            "Comment deleted successfully"
+        )
+    );
+});
 
 export default {
     addComment,

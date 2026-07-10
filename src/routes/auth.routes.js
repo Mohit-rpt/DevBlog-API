@@ -49,6 +49,7 @@ router.patch(
     upload.single("coverImage"),
     coverImageUpdate
 )
+router.post("/logout", verifyJWT, logoutUser);
 
 
 export default router;

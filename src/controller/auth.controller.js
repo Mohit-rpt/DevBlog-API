@@ -487,6 +487,9 @@ const coverImageUpdate = asyncHandler(async (req, res) => {
 
 const logoutUser = asyncHandler(async (req, res) => {
 
+    console.log("Logout route hit");
+    console.log(req.user);
+    
     await User.findByIdAndUpdate(
         req.user._id,
         {

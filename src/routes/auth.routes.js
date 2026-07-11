@@ -10,11 +10,59 @@ import {
     getCurrentUser,
     updateUserProfile,
     avatarUpdate,
-    coverImageUpdate
+    coverImageUpdate,
+    logoutUser
 } from "../controller/auth.controller.js";
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * /api/v1/auth/register:
+ *   post:
+ *     summary: Register a new user
+ *     description: Creates a new user account with avatar and optional cover image.
+ *     tags:
+ *       - Authentication
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - fullname
+ *               - username
+ *               - email
+ *               - password
+ *               - avatar
+ *             properties:
+ *               fullname:
+ *                 type: string
+ *                 example: Mohit Rajput
+ *               username:
+ *                 type: string
+ *                 example: mohit
+ *               email:
+ *                 type: string
+ *                 example: mohit@gmail.com
+ *               password:
+ *                 type: string
+ *                 example: Mohit@123
+ *               avatar:
+ *                 type: string
+ *                 format: binary
+ *               coverImage:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       201:
+ *         description: User registered successfully
+ *       400:
+ *         description: Validation error
+ *       409:
+ *         description: User already exists
+ */
 router.post(
     "/register",
     upload.fields([

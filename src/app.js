@@ -6,9 +6,16 @@ import likeRouter from "./routes/like.routes.js"
 import bookmarkRouter from "./routes/bookmark.routes.js"
 import cookieParser from "cookie-parser";
 import { swaggerUi, specs } from "./docs/swagger.js";
-
+import cors from "cors";
 
 const app = express()
+
+app.use(
+    cors({
+        origin: process.env.CORS_ORIGIN,
+        credentials: true,
+    })
+);
 
 app.use(cookieParser());
 app.use(express.json());

@@ -13,10 +13,23 @@ const verifyJWT = asyncHandler(async (req, res, next) => {
         throw new ApiError(401, "Unauthorized, no token provided");
     }
 
-    const decodedToken = jwt.verify(
+   let decodedToken;
+
+try {
+
+    decodedToken = jwt.verify(
         token,
         process.env.ACCESS_TOKEN_SECRET
     );
+
+} catch (error) {
+
+    throw new ApiError(
+        401,
+        "Access token expired or invalid"
+    );
+
+}
 
     const user = await User.findById(decodedToken._id)
         .select("-password -refreshToken");

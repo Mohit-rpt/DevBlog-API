@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
-
+import { useContext } from "react"
+import AuthContext from "../context/AuthContext"
 
 const Login = () => {
 
     const navigate = useNavigate();
-    
+    const { login } = useContext(AuthContext);
+
     const [formData, setFormData] = useState({
         email: "",
         password: ""
@@ -34,17 +36,15 @@ const Login = () => {
             }
         );
          // Backend ka response console me dekhne ke liye
-        console.log(response.data);
+         login(response.data.data.user);
 
-         // Login successful
         alert("Login Successful!");
 
-        // Home page par redirect
+        // Home page pr redirect
         navigate("/");
 
       }catch (error){
 
-        // Agar backend se error aaye
         console.error(error);
 
         alert(

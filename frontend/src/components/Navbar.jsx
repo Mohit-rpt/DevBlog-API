@@ -1,6 +1,27 @@
 import { Link } from "react-router-dom";
+import { useContext } from "react";
+import AuthContext from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import api from "../services/api";
 
 const Navbar = () => {
+  const { user, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const handleLogout = async () => {
+    try{
+   
+      const response = await api.post("/auth/logout");
+      console.log(response.data);
+      logout()
+      alert("Logout Successful!");
+      navigate("/")
+    }catch (error){
+      console.error(error);
+      console.log(error.response);
+      console.log(error.response?.data);
+    console.log(error.response?.status);
+    }
+  }
   return (
     <nav className="bg-blue-600 text-white shadow-md">
       <Link to="/" className="text-2xl font-bold">
@@ -11,12 +32,34 @@ const Navbar = () => {
           <Link to="/" className="hover:text-gray-200 transition">
             Home
           </Link>
-          <Link to="/login" className="hover:text-gray-200 transition">
-            Login
-          </Link>
-          <Link to="/register" className="hover:text-gray-200 transition">
-            Register
-          </Link>
+
+          {user ? (
+            <>
+              <Link
+                to="/create-post"
+                className="hover:text-gray-200 transition"
+              >
+                Create Post
+              </Link>
+
+              <button
+                onClick={handleLogout}
+                className="hover:text-gray-200 transition"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="hover:text-gray-200 transition">
+                Login
+              </Link>
+
+              <Link to="/register" className="hover:text-gray-200 transition">
+                Register
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </nav>

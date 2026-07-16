@@ -1,5 +1,108 @@
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import MainLayout from "../layouts/MainLayout";
+import api from "../services/api";
+
 const SinglePost = () => {
-    return <h1>Single Post Page</h1>;
+  const { id } = useParams();
+
+  const [post, setPost] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchPost = async () => {
+    try {
+      const response = await api.get(`/posts/${id}`);
+      setPost(response.data.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPost();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <MainLayout>
+        <div className="max-w-4xl mx-auto p-6">
+          <h2 className="text-center text-xl font-semibold">Loading...</h2>
+        </div>
+      </MainLayout>
+    );
+  }
+
+  if (!post) {
+    return (
+      <MainLayout>
+        <div className="max-w-4xl mx-auto p-6">
+          <h2 className="text-center text-xl font-semibold text-red-500">
+            Post not found
+          </h2>
+        </div>
+      </MainLayout>
+    );
+  }
+
+  return (
+    <MainLayout>
+      <div className="max-w-4xl mx-auto px-6 py-10">
+
+        {/* Thumbnail */}
+        <img
+          src={post.thumbnail}
+          alt={post.title}
+          className="w-full h-[450px] object-cover rounded-xl shadow-md"
+        />
+
+        {/* Title */}
+        <h1 className="text-5xl font-bold mt-8 leading-tight">
+          {post.title}
+        </h1>
+
+        {/* Author */}
+        <div className="flex items-center justify-between mt-8 border-b pb-6">
+
+          <div className="flex items-center gap-4">
+
+            <img
+              src={post.author.avatar}
+              alt={post.author.fullname}
+              className="w-14 h-14 rounded-full object-cover"
+            />
+
+            <div>
+              <p className="font-semibold text-lg">
+                {post.author.fullname}
+              </p>
+
+              <p className="text-gray-500 text-sm">
+                @{post.author.username}
+              </p>
+
+              <p className="text-gray-500 text-sm">
+                {post.author.email}
+              </p>
+            </div>
+
+          </div>
+
+          <p className="text-gray-500">
+            {new Date(post.createdAt).toLocaleDateString()}
+          </p>
+
+        </div>
+
+        {/* Content */}
+        <div className="mt-10 text-lg leading-9 whitespace-pre-wrap text-gray-800">
+          {post.content}
+        </div>
+
+      </div>
+    </MainLayout>
+  );
 };
 
 export default SinglePost;

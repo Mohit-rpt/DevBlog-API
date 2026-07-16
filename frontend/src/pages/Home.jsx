@@ -1,6 +1,7 @@
 import MainLayout from "../layouts/MainLayout.jsx";
 import api from "../services/api.js";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
 
@@ -33,6 +34,8 @@ const Home = () => {
 
     }, []);
 
+    const navigate = useNavigate();
+
     return (
         <MainLayout>
 
@@ -50,9 +53,10 @@ const Home = () => {
 
                     posts.map(post => (
 
-                        <div
+                       <div
                             key={post._id}
-                            className="border rounded-lg p-5 mb-5 shadow"
+                            onClick={() => navigate(`/post/${post._id}`)}
+                            className="border rounded-lg p-5 mb-5 shadow cursor-pointer hover:shadow-lg transition"
                         >
                             <h2 className="text-2xl font-semibold">
                                 {post.title}
@@ -67,7 +71,6 @@ const Home = () => {
                             </p>
 
                         </div>
-
                     ))
 
                 )}

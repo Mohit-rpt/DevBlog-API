@@ -61,7 +61,7 @@ userSchema.methods.generateAccessToken = function(){
             email: this.email,
         },
         process.env.ACCESS_TOKEN_SECRET,
-        {expiresIn: "1d"}
+        {expiresIn: "2d"}
     )
 }
 userSchema.methods.generateRefreshToken = function(){

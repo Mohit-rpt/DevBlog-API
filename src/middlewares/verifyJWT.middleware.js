@@ -4,6 +4,10 @@ import ApiError from "../utils/ApiError.js";
 import asyncHandler from "../utils/asyncHandler.js";
 
 const verifyJWT = asyncHandler(async (req, res, next) => {
+    
+   console.log("===== VERIFY JWT =====");
+    console.log("Cookies:", req.cookies);
+    console.log("Cookie Header:", req.headers.cookie);
 
     const token =
         req.cookies?.accessToken ||

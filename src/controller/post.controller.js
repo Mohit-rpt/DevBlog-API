@@ -7,8 +7,11 @@ import mongoose from "mongoose";
 
 
 const createPost = asyncHandler(async (req, res) => {
+    
     const title = req.body.title?.trim();
     const content = req.body.content?.trim();
+    const category = req.body.category?.trim();
+    const tags = req.body.tags;
 
    if (
     !title ||
@@ -48,13 +51,19 @@ const createPost = asyncHandler(async (req, res) => {
     .filter(result => result.status === "fulfilled" && result.value)
     .map(result => result.value.secure_url);
  }
-    const post = await Post.create({
-        title,
-        content,
-        author: req.user._id,
-        thumbnail: thumbnailURL,
-        contentImages: imageURLs
-    });
+   const post = await Post.create({
+    title,
+    content,
+    author: req.user._id,
+    thumbnail: thumbnailURL,
+    contentImages: imageURLs,
+    category,
+   tags: Array.isArray(tags)
+    ? tags
+    : tags
+        ? tags.split(",").map(tag => tag.trim())
+        : []
+});
 
     const createdPost = await Post.findById(post._id)
     .populate("author", "fullname username email avatar");

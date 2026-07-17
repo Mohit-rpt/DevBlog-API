@@ -6,8 +6,10 @@ import asyncHandler from "../utils/asyncHandler.js";
 const verifyJWT = asyncHandler(async (req, res, next) => {
     
    console.log("===== VERIFY JWT =====");
-    console.log("Cookies:", req.cookies);
-    console.log("Cookie Header:", req.headers.cookie);
+    console.log("URL:", req.originalUrl);
+    console.log("METHOD:", req.method);
+    console.log("HEADERS COOKIE:", req.headers.cookie);
+    console.log("PARSED COOKIES:", req.cookies);
 
     const token =
         req.cookies?.accessToken ||

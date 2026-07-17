@@ -3,9 +3,12 @@ import { useParams } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
 import api from "../services/api";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
 
 const SinglePost = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -46,6 +49,39 @@ const SinglePost = () => {
       </MainLayout>
     );
   }
+
+ const handleDelete = async () => {
+
+    const confirmDelete = window.confirm(
+        "Are you sure you want to delete this post?"
+    );
+
+    if (!confirmDelete) {
+        return;
+    }
+
+    try {
+
+        const response = await api.delete(`/posts/${id}`);
+
+        console.log(response.data);
+        if(response.data.success){
+            alert("Post deleted successfully");
+            navigate("/");
+        }
+    } catch (error) {
+
+       console.log("DELETE ERROR:");
+        console.log(error);
+        console.log(error.response);
+        console.log(error.message);
+        
+
+        alert("Failed to delete post.");
+
+    }
+
+};
 
   return (
     <MainLayout>
@@ -93,6 +129,12 @@ const SinglePost = () => {
             >
                 Edit Post
             </Link>
+          <button
+              onClick={handleDelete}
+              className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+          >
+              Delete Post
+          </button>
 
           </div>
 

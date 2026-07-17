@@ -7,6 +7,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import SinglePost from "./pages/SinglePost";
 import EditPost from "./pages/EditPost";
 
+
 function App() {
   return (
     <Routes>

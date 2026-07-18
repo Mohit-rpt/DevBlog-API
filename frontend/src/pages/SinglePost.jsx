@@ -71,7 +71,7 @@ const SinglePost = () => {
         }
     } catch (error) {
 
-       console.log("DELETE ERROR:");
+        console.log("DELETE ERROR:");
         console.log(error);
         console.log(error.response);
         console.log(error.message);

@@ -4,12 +4,14 @@ import Footer from "../components/Footer";
 const MainLayout = ({ children }) => {
     return (
         <>
-            <Navbar />
-            <main className="min-h-screen">
-                {children}
-            </main>
-            <Footer />
-        </>
+    <Navbar />
+
+    <main>
+        {children}
+    </main>
+
+    <Footer />
+</>
     );
 };
 

@@ -27,6 +27,7 @@ const [likedByUser, setLikedByUser] = useState(false);
 const [comments, setComments] = useState([]);
 const [commentText, setCommentText] = useState("");
 const [totalComments, setTotalComments] = useState(0);
+const [bookmarked, setBookmarked] = useState(false);
 
   const fetchPost = async () => {
     try {
@@ -63,11 +64,28 @@ const fetchComments = async () => {
 
   }
 };
+const fetchBookmarks = async () => {
+  try {
+    const response = await api.get("/bookmarks/bookmarkedPosts");
+
+    const bookmarkedPosts = response.data.data.posts;
+
+    const isBookmarked = bookmarkedPosts.some(
+      (post) => post._id === id
+    );
+
+    setBookmarked(isBookmarked);
+
+  } catch (error) {
+    console.error(error);
+  }
+};
 
   useEffect(() => {
     fetchPost();
     fetchLikes();
     fetchComments();
+    fetchBookmarks();
   }, [id]);
 
   if (loading) {
@@ -137,6 +155,20 @@ const handleLike = async () => {
 
   }
 };
+const handleBookmark = async () => {
+  try {
+
+    await api.post(`/bookmarks/toggle/${id}`);
+
+    fetchBookmarks();
+
+  } catch (error) {
+
+    console.error(error);
+
+  }
+};
+
 const handleComment = async () => {
 
     if (!commentText.trim()) {
@@ -298,13 +330,24 @@ const handleDeleteComment = async (commentId) => {
             <span>{totalComments}</span>
         </button>
 
-        <button
-            className="flex items-center gap-2 px-5 py-3 rounded-xl bg-yellow-100 text-yellow-700 hover:bg-yellow-200 transition"
-        >
-            <Bookmark size={20} />
+       <button
+    onClick={handleBookmark}
+    className={`flex items-center gap-2 px-5 py-3 rounded-xl transition ${
+        bookmarked
+            ? "bg-yellow-500 text-white hover:bg-yellow-600"
+            : "bg-yellow-100 text-yellow-700 hover:bg-yellow-200"
+    }`}
+>
+    <Bookmark
+        size={20}
+        fill={bookmarked ? "currentColor" : "none"}
+    />
 
-            <span>Bookmark</span>
-        </button>
+    <span>
+        {bookmarked ? "Saved" : "Bookmark"}
+    </span>
+
+</button>
 
     </div>
 

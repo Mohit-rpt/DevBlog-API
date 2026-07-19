@@ -6,6 +6,7 @@ import CreatePost from "./pages/CreatePost";
 import ProtectedRoute from "./components/ProtectedRoute";
 import SinglePost from "./pages/SinglePost";
 import EditPost from "./pages/EditPost";
+import Bookmarks from "./pages/Bookmark";
 
 
 function App() {
@@ -32,6 +33,14 @@ function App() {
               </ProtectedRoute>
           }
       />
+      <Route
+  path="/bookmarks"
+  element={
+    <ProtectedRoute>
+      <Bookmarks />
+    </ProtectedRoute>
+  }
+/>
     </Routes>
     
   );

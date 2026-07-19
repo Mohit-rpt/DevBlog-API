@@ -53,7 +53,14 @@ const Navbar = () => {
           >
             Create Post
           </Link>
+          
         )}
+                <Link
+            to="/bookmarks"
+            className="font-medium hover:text-blue-600 transition"
+        >
+            Bookmarks
+        </Link>
 
       </div>
 

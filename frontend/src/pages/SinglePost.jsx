@@ -11,6 +11,7 @@ import {
   SquarePen,
   Trash2,
   ArrowLeft,
+  Send,
 } from "lucide-react";
 
 const SinglePost = () => {
@@ -21,6 +22,9 @@ const SinglePost = () => {
   const [loading, setLoading] = useState(true);
   const [likesCount, setLikesCount] = useState(0);
 const [likedByUser, setLikedByUser] = useState(false);
+const [comments, setComments] = useState([]);
+const [commentText, setCommentText] = useState("");
+const [totalComments, setTotalComments] = useState(0);
 
   const fetchPost = async () => {
     try {
@@ -43,10 +47,25 @@ const [likedByUser, setLikedByUser] = useState(false);
     console.error(error);
   }
 };
+const fetchComments = async () => {
+  try {
+
+    const response = await api.get(`/comments/get/${id}`);
+
+    setComments(response.data.data.comments);
+    setTotalComments(response.data.data.totalComments);
+
+  } catch (error) {
+
+    console.error(error);
+
+  }
+};
 
   useEffect(() => {
     fetchPost();
     fetchLikes();
+    fetchComments();
   }, [id]);
 
   if (loading) {
@@ -115,6 +134,29 @@ const handleLike = async () => {
     console.error(error);
 
   }
+};
+const handleComment = async () => {
+
+    if (!commentText.trim()) {
+        return;
+    }
+
+    try {
+
+        await api.post(`/comments/add/${id}`, {
+            content: commentText,
+        });
+
+        setCommentText("");
+
+        fetchComments();
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
+
 };
 
   return (
@@ -197,45 +239,128 @@ const handleLike = async () => {
 
         </div>
 
-        {/* Content */}
-       <div className="mt-10 bg-white rounded-2xl shadow-md p-8 text-lg leading-9 whitespace-pre-wrap text-gray-800">
-          {post.content}
-        </div>
+       {/* Content */}
+<div className="mt-10 bg-white rounded-2xl shadow-md p-8 text-lg leading-9 whitespace-pre-wrap text-gray-800">
+    {post.content}
+</div>
 
-      </div>
-   <div className="mt-12 border-t pt-8 flex justify-center">
+{/* Action Buttons */}
+<div className="mt-10 border-t pt-8 flex justify-center">
 
-  <div className="grid grid-cols-3 gap-4 w-fit">
+    <div className="flex flex-wrap gap-4">
 
-    <button
-  onClick={handleLike}
-  className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl transition ${
-    likedByUser
-      ? "bg-red-500 text-white"
-      : "bg-pink-100 hover:bg-pink-200"
-  }`}
->
-  <Heart
-    size={20}
-    fill={likedByUser ? "currentColor" : "none"}
-  />
+        <button
+            onClick={handleLike}
+            className={`flex items-center gap-2 px-5 py-3 rounded-xl transition ${
+                likedByUser
+                    ? "bg-red-500 text-white hover:bg-red-600"
+                    : "bg-red-100 text-red-600 hover:bg-red-200"
+            }`}
+        >
+            <Heart
+                size={20}
+                fill={likedByUser ? "currentColor" : "none"}
+            />
 
-  {likesCount} Like
-</button>
+            <span>{likesCount}</span>
+        </button>
 
-    <button className="w-40 flex items-center justify-center gap-2 ...">
-      <MessageCircle size={20} />
-      Comment
-    </button>
+        <button
+            className="flex items-center gap-2 px-5 py-3 rounded-xl bg-blue-100 text-blue-600 hover:bg-blue-200 transition"
+        >
+            <MessageCircle size={20} />
 
-    <button className="w-40 flex items-center justify-center gap-2 ...">
-      <Bookmark size={20} />
-      Bookmark
-    </button>
+            <span>{totalComments}</span>
+        </button>
 
-  </div>
+        <button
+            className="flex items-center gap-2 px-5 py-3 rounded-xl bg-yellow-100 text-yellow-700 hover:bg-yellow-200 transition"
+        >
+            <Bookmark size={20} />
+
+            <span>Bookmark</span>
+        </button>
+
+    </div>
 
 </div>
+
+{/* Comment Box */}
+
+<div className="mt-14">
+
+    <h2 className="text-3xl font-bold mb-6">
+        Comments ({totalComments})
+    </h2>
+
+    <div className="bg-white rounded-2xl shadow-md p-6">
+
+        <textarea
+            value={commentText}
+            onChange={(e) => setCommentText(e.target.value)}
+            placeholder="Write your thoughts..."
+            className="w-full border-2 border-gray-200 rounded-xl p-4 resize-none focus:border-blue-500 focus:outline-none transition"
+            rows={4}
+        />
+
+       <button
+        onClick={handleComment}
+        className="mt-4 inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition shadow-lg"
+    >
+        <Send size={18} />
+        Post Comment
+    </button>
+
+    </div>
+
+</div>
+
+{/* All Comments */}
+
+<div className="mt-10 space-y-6">
+
+    {comments.map((comment) => (
+
+        <div
+            key={comment._id}
+            className="bg-white rounded-2xl shadow-md p-6"
+        >
+
+            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition">
+
+                <img
+                    src={comment.owner.avatar}
+                    alt={comment.owner.fullname}
+                    className="w-12 h-12 rounded-full object-cover"
+                />
+
+                <div>
+
+                    <h3 className="font-semibold">
+                        {comment.owner.fullname}
+                    </h3>
+
+                    <p className="text-gray-500 text-sm">
+                        @{comment.owner.username}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      {new Date(comment.createdAt).toLocaleDateString()}
+                  </p>
+
+                </div>
+
+            </div>
+
+            <p className="mt-5 text-gray-700 leading-8 text-[17px]">
+                {comment.content}
+            </p>
+
+        </div>
+
+    ))}
+
+    </div>
+    </div>
     </MainLayout>
   );
 };

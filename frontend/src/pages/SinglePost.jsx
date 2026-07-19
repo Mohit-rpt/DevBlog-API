@@ -4,6 +4,8 @@ import MainLayout from "../layouts/MainLayout";
 import api from "../services/api";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import AuthContext from "../context/AuthContext";
 import {
   Heart,
   MessageCircle,
@@ -17,7 +19,7 @@ import {
 const SinglePost = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-
+  const { user } = useContext(AuthContext);
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [likesCount, setLikesCount] = useState(0);
@@ -154,6 +156,29 @@ const handleComment = async () => {
     } catch (error) {
 
         console.error(error);
+
+    }
+
+};
+const handleDeleteComment = async (commentId) => {
+
+    const confirmDelete = window.confirm(
+        "Delete this comment?"
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+
+        await api.delete(`/comments/delete/${commentId}`);
+
+        fetchComments();
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("Failed to delete comment");
 
     }
 
@@ -326,31 +351,41 @@ const handleComment = async () => {
             className="bg-white rounded-2xl shadow-md p-6"
         >
 
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition">
+           <div className="flex items-start justify-between">
 
-                <img
-                    src={comment.owner.avatar}
-                    alt={comment.owner.fullname}
-                    className="w-12 h-12 rounded-full object-cover"
-                />
 
-                <div>
+    <img
+        src={comment.owner.avatar}
+        alt={comment.owner.fullname}
+        className="w-12 h-12 rounded-full object-cover"
+    />
 
-                    <h3 className="font-semibold">
-                        {comment.owner.fullname}
-                    </h3>
+    <div>
 
-                    <p className="text-gray-500 text-sm">
-                        @{comment.owner.username}
-                    </p>
-                    <p className="text-xs text-gray-400 mt-1">
-                      {new Date(comment.createdAt).toLocaleDateString()}
-                  </p>
+        <h3 className="font-semibold">
+            {comment.owner.fullname}
+        </h3>
 
-                </div>
+        <p className="text-gray-500 text-sm">
+            @{comment.owner.username}
+        </p>
 
-            </div>
+        <p className="text-xs text-gray-400 mt-1">
+            {new Date(comment.createdAt).toLocaleDateString()}
+        </p>
 
+    </div>
+
+</div>
+
+{user?._id === comment.owner._id && (
+    <button
+        onClick={() => handleDeleteComment(comment._id)}
+        className="text-red-500 hover:text-red-700 transition"
+    >
+        🗑 Delete
+    </button>
+)}
             <p className="mt-5 text-gray-700 leading-8 text-[17px]">
                 {comment.content}
             </p>

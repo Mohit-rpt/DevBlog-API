@@ -79,7 +79,35 @@ const getLikedPosts = asyncHandler(async(req,res)=>{
     )
 
 })
+const getPostLikes = asyncHandler(async (req, res) => {
+    const { postId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(postId)) {
+        throw new ApiError(400, "Invalid post id");
+    }
+
+    const likesCount = await Like.countDocuments({
+        post: postId
+    });
+
+    const likedByUser = await Like.findOne({
+        owner: req.user._id,
+        post: postId
+    });
+
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            {
+                likesCount,
+                likedByUser: !!likedByUser
+            },
+            "Likes fetched successfully"
+        )
+    );
+});
 export default{
     likePost,
-    getLikedPosts
+    getLikedPosts,
+    getPostLikes
 }

@@ -126,7 +126,7 @@ const fetchBookmarks = async () => {
 
         console.log(response.data);
         if(response.data.success){
-            alert("Post deleted successfully");
+            toast.success("Post deleted successfully 🗑️");
             navigate("/");
         }
     } catch (error) {
@@ -137,7 +137,7 @@ const fetchBookmarks = async () => {
         console.log(error.message);
         
 
-        alert("Failed to delete post.");
+        toast.error("Failed to delete post");
 
     }
 
@@ -210,7 +210,7 @@ const handleDeleteComment = async (commentId) => {
 
         console.error(error);
 
-        alert("Failed to delete comment");
+        toast.error("Failed to delete post");
 
     }
 

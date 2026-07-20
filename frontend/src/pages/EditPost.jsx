@@ -78,7 +78,7 @@ const EditPost = () => {
           .map((tag) => tag.trim()),
       });
 
-      alert("Post Updated Successfully 🚀");
+      toast.success("Post updated successfully! ✨");
 
       navigate(`/post/${id}`);
     } catch (error) {

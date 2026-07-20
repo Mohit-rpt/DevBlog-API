@@ -7,42 +7,46 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import SinglePost from "./pages/SinglePost";
 import EditPost from "./pages/EditPost";
 import Bookmarks from "./pages/Bookmark";
-
+import { Toaster } from "react-hot-toast";
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route
-        path="/create-post"
-        element={
-          <ProtectedRoute>
-            <CreatePost />
-          </ProtectedRoute>
-        }
-      />
-      <Route path="/post/:id" element={<SinglePost/>}
-/>
-      <Route
+    <>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route
+          path="/create-post"
+          element={
+            <ProtectedRoute>
+              <CreatePost />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/post/:id" element={<SinglePost />} />
+        <Route
           path="/edit-post/:id"
           element={
-              <ProtectedRoute>
-                  <EditPost />
-              </ProtectedRoute>
+            <ProtectedRoute>
+              <EditPost />
+            </ProtectedRoute>
           }
+        />
+        <Route
+          path="/bookmarks"
+          element={
+            <ProtectedRoute>
+              <Bookmarks />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+      <Toaster
+        position="top-right"
+        reverseOrder={false}
       />
-      <Route
-  path="/bookmarks"
-  element={
-    <ProtectedRoute>
-      <Bookmarks />
-    </ProtectedRoute>
-  }
-/>
-    </Routes>
-    
+    </>
   );
 }
 

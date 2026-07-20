@@ -78,8 +78,7 @@ const CreatePost = () => {
         },
       });
 
-      alert("Post Published Successfully 🚀");
-
+      toast.success("Post created successfully! 🚀");
       navigate("/");
 
     } catch (error) {

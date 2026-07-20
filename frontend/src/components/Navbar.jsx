@@ -3,25 +3,30 @@ import { useContext } from "react";
 import AuthContext from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
+import toast from "react-hot-toast";
 
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const handleLogout = async () => {
-    try{
-   
-      const response = await api.post("/auth/logout");
-      console.log(response.data);
-      logout()
-      alert("Logout Successful!");
-      navigate("/")
-    }catch (error){
-      console.error(error);
-      console.log(error.response);
-      console.log(error.response?.data);
-    console.log(error.response?.status);
-    }
+  try {
+    const response = await api.post("/auth/logout");
+
+    console.log(response.data);
+
+    logout();
+
+    toast.success("Logged out successfully 👋");
+
+    navigate("/");
+  } catch (error) {
+    console.error(error);
+
+    toast.error(
+      error.response?.data?.message || "Logout Failed"
+    );
   }
+};
  return (
   <nav className="bg-white shadow-md sticky top-0 z-50">
     <div className="max-w-7xl mx-auto px-8 py-4 flex items-center justify-between">

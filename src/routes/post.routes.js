@@ -10,7 +10,8 @@ const { createPost,
     getAllPosts,
     getSinglePost,
     updatePost,
-    deletePost } = postController;
+    deletePost,
+    getMyPosts } = postController;
 
 router.post(
     "/create",
@@ -29,8 +30,10 @@ router.post(
 );
 
 router.get("/all", getAllPosts);
+router.get("/my-posts", verifyJWT, getMyPosts);
 router.get("/:id", getSinglePost);
 router.put("/:id", verifyJWT, updatePost);
 router.delete("/:id", verifyJWT, deletePost);
+
 
 export default router;

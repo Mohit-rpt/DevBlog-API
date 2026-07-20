@@ -161,6 +161,34 @@ const getAllPosts = asyncHandler(async (req, res) => {
         )
     );
 });
+const getMyPosts = asyncHandler(async (req, res) => {
+
+    const posts = await Post.find({
+        author: req.user._id
+    })
+    .populate(
+        "author",
+        "fullname username avatar"
+    )
+    .sort({
+        createdAt: -1
+    });
+
+    return res.status(200).json(
+
+        new ApiResponse(
+
+            200,
+
+            posts,
+
+            "My posts fetched successfully"
+
+        )
+
+    );
+
+});
 const getSinglePost = asyncHandler(async (req, res) => {
     const { id } = req.params;
 
@@ -273,5 +301,6 @@ export default {
     getAllPosts,
     getSinglePost,
     updatePost,
-    deletePost 
+    deletePost ,
+    getMyPosts
 }

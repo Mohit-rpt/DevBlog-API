@@ -8,11 +8,21 @@ import SinglePost from "./pages/SinglePost";
 import EditPost from "./pages/EditPost";
 import Bookmarks from "./pages/Bookmark";
 import { Toaster } from "react-hot-toast";
+import MyPosts from "./pages/MyPosts";
+
 
 function App() {
   return (
     <>
       <Routes>
+        <Route
+    path="/my-posts"
+    element={
+        <ProtectedRoute>
+            <MyPosts />
+        </ProtectedRoute>
+    }
+/>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />

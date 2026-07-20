@@ -16,7 +16,7 @@ const CreatePost = () => {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
-
+  const [preview, setPreview] = useState(null);
   const [formData, setFormData] = useState({
     title: "",
     content: "",
@@ -26,14 +26,27 @@ const CreatePost = () => {
   });
 
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
+  const { name, value, files } = e.target;
 
+  if (files) {
     setFormData((prev) => ({
       ...prev,
-      [name]: files ? files[0] : value,
+      [name]: files[0],
     }));
-  };
+ 
 
+    if (name === "thumbnail") {
+      setPreview(URL.createObjectURL(files[0]));
+    }
+
+    return;
+  }
+
+  setFormData((prev) => ({
+    ...prev,
+    [name]: value,
+  }));
+};
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -233,13 +246,47 @@ const CreatePost = () => {
 
               </p>
 
-              <input
-                type="file"
-                name="thumbnail"
-                accept="image/*"
-                onChange={handleChange}
-                className="hidden"
-              />
+             <div>
+
+  <label className="flex items-center gap-2 font-semibold mb-3">
+
+    Thumbnail
+
+  </label>
+
+  <label className="border-2 border-dashed border-blue-300 rounded-2xl p-6 flex flex-col items-center cursor-pointer hover:bg-blue-50 transition">
+
+    {preview ? (
+
+      <img
+        src={preview}
+        alt="Preview"
+        className="w-full h-56 object-cover rounded-xl shadow-md"
+      />
+
+    ) : (
+
+      <>
+        <p className="text-5xl">🖼️</p>
+
+        <p className="mt-4 text-gray-500">
+          Click to upload thumbnail
+        </p>
+      </>
+
+    )}
+
+    <input
+      type="file"
+      name="thumbnail"
+      accept="image/*"
+      onChange={handleChange}
+      className="hidden"
+    />
+
+  </label>
+
+</div>
 
             </label>
 

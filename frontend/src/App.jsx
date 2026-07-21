@@ -9,7 +9,7 @@ import EditPost from "./pages/EditPost";
 import Bookmarks from "./pages/Bookmark";
 import { Toaster } from "react-hot-toast";
 import MyPosts from "./pages/MyPosts";
-
+import Profile from "./pages/Profile";
 
 function App() {
   return (
@@ -33,6 +33,14 @@ function App() {
               <CreatePost />
             </ProtectedRoute>
           }
+        />
+        <Route
+            path="/profile"
+            element={
+                <ProtectedRoute>
+                    <Profile />
+                </ProtectedRoute>
+            }
         />
         <Route path="/post/:id" element={<SinglePost />} />
         <Route

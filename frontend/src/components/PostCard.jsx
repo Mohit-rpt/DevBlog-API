@@ -50,8 +50,8 @@ const PostCard = ({ post }) => {
                 <div className="flex justify-between items-center mt-5">
 
                     <p className="text-sm text-gray-500">
-                        By {post.author.fullname}
-                    </p>
+                        @{post.author.username}
+                    </p>        
 
                     <button
                       className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition font-medium"

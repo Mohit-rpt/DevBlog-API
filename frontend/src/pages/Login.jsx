@@ -188,8 +188,8 @@ const Login = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 rounded-xl font-semibold flex items-center justify-center gap-2 hover:shadow-xl hover:scale-[1.02] transition disabled:opacity-60 disabled:hover:scale-100"
-              active:scale-95
+              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 rounded-xl font-semibold flex items-center justify-center gap-2 hover:shadow-xl hover:scale-[1.02] transition disabled:opacity-60 disabled:hover:scale-100 active:scale-95"
+              
             >
 
               {loading ? (
